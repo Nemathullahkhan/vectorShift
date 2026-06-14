@@ -35,7 +35,7 @@ export const useStore = create((set, get) => ({
       },
     });
 
-    return `${baseTitle} ${nextCount}`;
+    return `${baseTitle.replace(/ /g, "_")}_${nextCount}`;
   },
 
   addNode: (node) => {
@@ -72,26 +72,21 @@ export const useStore = create((set, get) => ({
 
   updateNodeField: (nodeId, fieldName, fieldValue) => {
     set({
-      nodes: get().nodes.map((node) => {
-        if (node.id === nodeId) {
-          node.data = { ...node.data, [fieldName]: fieldValue };
-        }
-        return node;
-      }),
+      nodes: get().nodes.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, [fieldName]: fieldValue } }
+          : node,
+      ),
     });
   },
 
   updateNodeDynamicHandles: (nodeId, dynamicHandles) => {
     set({
-      nodes: get().nodes.map((node) => {
-        if (node.id === nodeId) {
-          node.data = {
-            ...node.data,
-            dynamicInputHandles: dynamicHandles,
-          };
-        }
-        return node;
-      }),
+      nodes: get().nodes.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, dynamicInputHandles: dynamicHandles } }
+          : node,
+      ),
     });
   },
 
@@ -109,5 +104,36 @@ export const useStore = create((set, get) => ({
       name: node.data?.nodeName || node.type,
       type: node.type,
     }));
+  },
+
+  syncVariableEdges: (nodeId, dynamicHandles) => {
+    const { nodes, edges } = get();
+
+    // Remove all previously auto-generated edges targeting this node's dynamic handles
+    const baseEdges = edges.filter(
+      (edge) => !(edge.target === nodeId && edge.id?.startsWith("auto-var-")),
+    );
+
+    const newEdges = [];
+    for (const handle of dynamicHandles) {
+      const sourceNode = nodes.find(
+        (n) => n.data?.nodeName === handle.originalNodeName,
+      );
+      if (!sourceNode) continue;
+
+      const edgeId = `auto-var-${sourceNode.id}-${nodeId}-${handle.id}`;
+      newEdges.push({
+        id: edgeId,
+        source: sourceNode.id,
+        sourceHandle: `${sourceNode.id}-output-${handle.originalFieldName}`,
+        target: nodeId,
+        targetHandle: `${nodeId}-input-${handle.id}`,
+        type: "smoothstep",
+        animated: true,
+        markerEnd: { type: MarkerType.Arrow, height: "20px", width: "20px" },
+      });
+    }
+
+    set({ edges: [...baseEdges, ...newEdges] });
   },
 }));

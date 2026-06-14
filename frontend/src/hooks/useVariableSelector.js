@@ -61,12 +61,9 @@ export const useVariableSelector = () => {
       requestAnimationFrame(() => {
         if (!textareaElement || !nodeContainerRef?.current) return;
 
-        const textareaRect = textareaElement.getBoundingClientRect();
-        const nodeRect = nodeContainerRef.current.getBoundingClientRect();
-
-        const relativeLeft = textareaRect.left - nodeRect.left;
-        const relativeTop = textareaRect.bottom - nodeRect.top + 5;
-        const width = textareaRect.width;
+        const relativeTop = textareaElement.offsetTop + textareaElement.offsetHeight + 5;
+        const relativeLeft = textareaElement.offsetLeft;
+        const width = textareaElement.offsetWidth;
 
         setPosition({
           top: relativeTop,
@@ -104,8 +101,9 @@ export const useVariableSelector = () => {
     (variableString) => {
       if (!activeField || !currentNodeIdRef.current) return;
 
+      const triggerPos = triggerPositionRef.current ?? cursorPos - 2;
       const newValue =
-        currentValue.substring(0, cursorPos) +
+        currentValue.substring(0, triggerPos) +
         variableString +
         currentValue.substring(cursorPos);
 
@@ -117,7 +115,7 @@ export const useVariableSelector = () => {
 
       if (currentTextareaRef.current) {
         currentTextareaRef.current.focus();
-        const newCursorPos = cursorPos + variableString.length;
+        const newCursorPos = triggerPos + variableString.length;
         currentTextareaRef.current.setSelectionRange(
           newCursorPos,
           newCursorPos,

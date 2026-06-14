@@ -11,6 +11,7 @@ import { cn } from "../lib/utils";
 export const BaseNode = ({ id, data, config }) => {
   const updateNodeField = useStore((state) => state.updateNodeField);
   const updateNodeDynamicHandles = useStore((state) => state.updateNodeDynamicHandles);
+  const syncVariableEdges = useStore((state) => state.syncVariableEdges);
   const onNodesChange = useStore((state) => state.onNodesChange);
   const nodes = useStore((state) => state.nodes);
 
@@ -115,6 +116,7 @@ export const BaseNode = ({ id, data, config }) => {
       if (currentHandles !== previousHandles) {
         previousVariablesRef.current = dynamicHandles;
         updateNodeDynamicHandles(id, dynamicHandles);
+        syncVariableEdges(id, dynamicHandles);
       }
     }, 300);
 
@@ -123,7 +125,7 @@ export const BaseNode = ({ id, data, config }) => {
         clearTimeout(updateTimeoutRef.current);
       }
     };
-  }, [fieldValues, id, config.fields, nodes, updateNodeDynamicHandles]);
+  }, [fieldValues, id, config.fields, nodes, updateNodeDynamicHandles, syncVariableEdges]);
 
   const allInputHandles = [
     ...(config.inputHandles || []),

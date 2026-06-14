@@ -55,6 +55,7 @@ export const VariableSelector = ({
       clickTimeoutRef.current = setTimeout(() => {
         if (
           selectorRef.current &&
+          document.body.contains(event.target) &&
           !selectorRef.current.contains(event.target)
         ) {
           onClose();
