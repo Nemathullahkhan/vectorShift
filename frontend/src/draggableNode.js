@@ -1,33 +1,22 @@
-// draggableNode.js
-
-export const DraggableNode = ({ type, label }) => {
-    const onDragStart = (event, nodeType) => {
-      const appData = { nodeType }
-      event.target.style.cursor = 'grabbing';
-      event.dataTransfer.setData('application/reactflow', JSON.stringify(appData));
-      event.dataTransfer.effectAllowed = 'move';
-    };
-  
-    return (
-      <div
-        className={type}
-        onDragStart={(event) => onDragStart(event, type)}
-        onDragEnd={(event) => (event.target.style.cursor = 'grab')}
-        style={{ 
-          cursor: 'grab', 
-          minWidth: '80px', 
-          height: '60px',
-          display: 'flex', 
-          alignItems: 'center', 
-          borderRadius: '8px',
-          backgroundColor: '#1C2536',
-          justifyContent: 'center', 
-          flexDirection: 'column'
-        }} 
-        draggable
-      >
-          <span style={{ color: '#fff' }}>{label}</span>
-      </div>
+export const DraggableNode = ({ type, label, Icon }) => {
+  const onDragStart = (event, nodeType) => {
+    event.dataTransfer.setData(
+      "application/reactflow",
+      JSON.stringify({ nodeType }),
     );
+    event.dataTransfer.effectAllowed = "move";
   };
-  
+
+  return (
+    <div
+      draggable
+      onDragStart={(event) => onDragStart(event, type)}
+      className="group flex min-w-[110px] cursor-grab flex-col items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800 p-4 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm transition-all hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md active:cursor-grabbing"
+    >
+      <span>{label}</span>
+      {Icon && (
+        <Icon className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-colors group-hover:text-gray-600 dark:group-hover:text-gray-400" />
+      )}
+    </div>
+  );
+};

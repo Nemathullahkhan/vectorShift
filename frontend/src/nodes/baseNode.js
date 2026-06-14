@@ -1,19 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Handle, Position } from "reactflow";
+import { X } from "lucide-react";
 import { useStore } from "../store";
-import {
-  extractVariables,
-  validateAllVariables,
-} from "../utils/variableParser";
+import { validateAllVariables } from "../utils/variableParser";
 import { getNodeConfig } from "./nodeRegistry";
 import { useVariableSelector } from "../hooks/useVariableSelector";
 import { VariableSelector } from "../components/variableSelector";
+import { cn } from "../lib/utils";
 
 export const BaseNode = ({ id, data, config }) => {
   const updateNodeField = useStore((state) => state.updateNodeField);
-  const updateNodeDynamicHandles = useStore(
-    (state) => state.updateNodeDynamicHandles,
-  );
+  const updateNodeDynamicHandles = useStore((state) => state.updateNodeDynamicHandles);
+  const onNodesChange = useStore((state) => state.onNodesChange);
   const nodes = useStore((state) => state.nodes);
 
   const [fieldValues, setFieldValues] = useState(() =>
@@ -60,14 +58,10 @@ export const BaseNode = ({ id, data, config }) => {
       const newValue = e.target.value;
       const cursorPos = e.target.selectionStart;
 
-      // Update local and global state
       setFieldValues((prev) => ({ ...prev, [fieldName]: newValue }));
       updateNodeField(id, fieldName, newValue);
-
-      // Check if we need to close the builder because trigger "{{" was removed
       checkAndCloseIfTriggerRemoved(newValue);
 
-      // Check for opening condition
       const textBeforeCursor = newValue.substring(0, cursorPos);
       if (textBeforeCursor.endsWith("{{") && cursorPos >= 2) {
         openSelector(
@@ -81,13 +75,7 @@ export const BaseNode = ({ id, data, config }) => {
         );
       }
     },
-    [
-      id,
-      updateNodeField,
-      openSelector,
-      updateFieldValue,
-      checkAndCloseIfTriggerRemoved,
-    ],
+    [id, updateNodeField, openSelector, updateFieldValue, checkAndCloseIfTriggerRemoved],
   );
 
   useEffect(() => {
@@ -117,7 +105,6 @@ export const BaseNode = ({ id, data, config }) => {
       const dynamicHandles = validation.validVariables.map((v) => ({
         id: `dynamic-${v.nodeName}-${v.fieldName}`,
         label: `${v.nodeName}.${v.fieldName}`,
-        color: "#6366f1",
         originalNodeName: v.nodeName,
         originalFieldName: v.fieldName,
       }));
@@ -149,6 +136,10 @@ export const BaseNode = ({ id, data, config }) => {
     updateNodeField(id, "nodeName", e.target.value);
   };
 
+  const handleDeleteNode = useCallback(() => {
+    onNodesChange([{ type: "remove", id }]);
+  }, [id, onNodesChange]);
+
   return (
     <div
       ref={nodeContainerRef}
@@ -156,55 +147,39 @@ export const BaseNode = ({ id, data, config }) => {
         position: "relative",
         width: config.width ?? 200,
         minHeight: config.height ?? "auto",
-        background: config.bgColor ?? "#ffffff",
-        border: `2px solid ${hasInvalidVariables ? "#ef4444" : (config.borderColor ?? "#cbd5e1")}`,
-        borderRadius: "10px",
-        padding: "10px 12px 12px",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-        fontFamily: "Inter, sans-serif",
-        fontSize: "12px",
-        boxSizing: "border-box",
       }}
+      className={cn(
+        "relative rounded-[1.25rem] border bg-card p-3 shadow-card font-sans text-xs",
+        hasInvalidVariables ? "border-red-500" : "border-border",
+      )}
     >
-      {/* Editable Node Name */}
-      <div style={{ marginBottom: "10px", textAlign: "center" }}>
-        <input
-          type="text"
-          value={data.nodeName || config.title}
-          onChange={handleNodeNameChange}
-          style={{
-            fontWeight: 700,
-            fontSize: "13px",
-            color: config.titleColor ?? "#1e293b",
-            textAlign: "center",
-            letterSpacing: "0.3px",
-            border: "1px solid transparent",
-            background: "transparent",
-            width: "100%",
-            padding: "2px",
-            borderRadius: "4px",
-            outline: "none",
-          }}
-          onFocus={(e) => (e.target.style.borderColor = "#cbd5e1")}
-          onBlur={(e) => (e.target.style.borderColor = "transparent")}
-        />
-        {hasInvalidVariables && errorMessage && (
-          <div
-            style={{
-              fontSize: "10px",
-              color: "#ef4444",
-              marginTop: "4px",
-              background: "#fef2f2",
-              padding: "2px 6px",
-              borderRadius: "4px",
-            }}
-          >
-            ⚠️ {errorMessage}
-          </div>
-        )}
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {config.icon && (
+            <config.icon className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+          )}
+          <input
+            type="text"
+            value={data.nodeName || config.title}
+            onChange={handleNodeNameChange}
+            className="flex-1 min-w-0 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-semibold text-foreground outline-none transition focus:border-border"
+          />
+        </div>
+        <button
+          onClick={handleDeleteNode}
+          className="flex-shrink-0 text-muted-foreground hover:text-foreground dark:hover:text-red-400 transition-colors"
+          title="Delete node"
+        >
+          <X size={16} />
+        </button>
       </div>
 
-      {/* Input Handles (Left side) */}
+      {hasInvalidVariables && errorMessage && (
+        <div className="mb-3 rounded-md bg-red-50 dark:bg-red-950 px-2 py-1 text-xs text-red-700 dark:text-red-200">
+          ⚠️ {errorMessage}
+        </div>
+      )}
+
       {allInputHandles.map((handle, idx) => (
         <Handle
           key={`input-${handle.id}`}
@@ -214,7 +189,7 @@ export const BaseNode = ({ id, data, config }) => {
           title={handle.label}
           style={{
             top: handleTop(idx, allInputHandles.length),
-            background: handle.color ?? "#94a3b8",
+            background: handle.color ?? "var(--node-handle)",
             width: 10,
             height: 10,
             border: "2px solid #fff",
@@ -224,18 +199,10 @@ export const BaseNode = ({ id, data, config }) => {
         />
       ))}
 
-      {/* Fields */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div className="flex flex-col gap-3">
         {config.fields?.map((field) => (
           <div key={field.name}>
-            <label
-              style={{
-                display: "block",
-                fontWeight: 600,
-                color: "#475569",
-                marginBottom: "3px",
-              }}
-            >
+            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
               {field.label}
             </label>
 
@@ -246,17 +213,7 @@ export const BaseNode = ({ id, data, config }) => {
                 onChange={(e) => handleChange(e, field.name)}
                 onInput={handleTextareaResize}
                 placeholder={field.placeholder ?? ""}
-                style={{
-                  width: "100%",
-                  padding: "4px 6px",
-                  fontSize: "12px",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "5px",
-                  outline: "none",
-                  boxSizing: "border-box",
-                  background: "#f8fafc",
-                  color: "#1e293b",
-                }}
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
               />
             )}
 
@@ -264,17 +221,7 @@ export const BaseNode = ({ id, data, config }) => {
               <select
                 value={fieldValues[field.name]}
                 onChange={(e) => handleChange(e, field.name)}
-                style={{
-                  width: "100%",
-                  padding: "4px 6px",
-                  fontSize: "12px",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "5px",
-                  outline: "none",
-                  boxSizing: "border-box",
-                  background: "#f8fafc",
-                  color: "#1e293b",
-                }}
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
               >
                 {field.options?.map((opt) => (
                   <option key={opt} value={opt}>
@@ -290,28 +237,14 @@ export const BaseNode = ({ id, data, config }) => {
                 onChange={(e) => handleChange(e, field.name)}
                 onInput={handleTextareaResize}
                 placeholder={field.placeholder ?? ""}
-                style={{
-                  width: "100%",
-                  padding: "4px 6px",
-                  fontSize: "12px",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: "5px",
-                  outline: "none",
-                  boxSizing: "border-box",
-                  background: "#f8fafc",
-                  color: "#1e293b",
-                  minHeight: "60px",
-                  maxHeight: "400px",
-                  resize: "none",
-                  overflow: "auto",
-                }}
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+                style={{ minHeight: 60, maxHeight: 400, resize: "none" }}
               />
             )}
           </div>
         ))}
       </div>
 
-      {/* Output Handles (Right side) */}
       {config.outputHandles?.map((handle, idx) => (
         <Handle
           key={`output-${handle.id}`}
@@ -321,7 +254,7 @@ export const BaseNode = ({ id, data, config }) => {
           title={handle.label}
           style={{
             top: handleTop(idx, config.outputHandles.length),
-            background: handle.color ?? "#94a3b8",
+            background: handle.color ?? "var(--node-handle)",
             width: 10,
             height: 10,
             border: "2px solid #fff",
@@ -331,7 +264,6 @@ export const BaseNode = ({ id, data, config }) => {
         />
       ))}
 
-      {/* Variable Selector rendered inside node */}
       {selectorOpen && (
         <VariableSelector
           isOpen={selectorOpen}

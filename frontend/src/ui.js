@@ -66,16 +66,16 @@ export const PipelineUI = () => {
       const config = getNodeConfig(type);
       const baseTitle = config?.title || type;
       const nodeName = getNextNodeName(type, baseTitle);
-      
+
       addNode({
         id: nodeID,
         type,
         position,
-        data: { 
-          id: nodeID, 
+        data: {
+          id: nodeID,
           nodeType: type,
           nodeName: nodeName,
-          dynamicInputHandles: []
+          dynamicInputHandles: [],
         },
       });
     },
@@ -83,8 +83,12 @@ export const PipelineUI = () => {
   );
 
   return (
-    <div ref={reactFlowWrapper} style={{ width: "100vw", height: "70vh" }}>
+    <div
+      ref={reactFlowWrapper}
+      className="h-[70vh] rounded-3xl border border-border bg-card shadow-card"
+    >
       <ReactFlow
+        className="h-full w-full"
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -98,7 +102,7 @@ export const PipelineUI = () => {
         snapGrid={[gridSize, gridSize]}
         connectionLineType="smoothstep"
       >
-        <Background color="#e2e8f0" gap={gridSize} />
+        <Background color="#94a3b8" gap={gridSize} />
         <Controls />
       </ReactFlow>
     </div>

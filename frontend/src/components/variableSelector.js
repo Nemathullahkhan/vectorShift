@@ -44,17 +44,14 @@ export const VariableSelector = ({
     setSelectedNode(null);
   };
 
-  // Click outside handler – using `click` event with a small delay
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event) => {
-      // Clear any existing timeout
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
       }
 
-      // Use a small delay to avoid interfering with ReactFlow's own drag/click
       clickTimeoutRef.current = setTimeout(() => {
         if (
           selectorRef.current &&
@@ -65,7 +62,6 @@ export const VariableSelector = ({
       }, 10);
     };
 
-    // Use `click` event – more reliable than `mousedown`
     document.addEventListener("click", handleClickOutside);
 
     return () => {
@@ -81,30 +77,15 @@ export const VariableSelector = ({
   return (
     <div
       ref={selectorRef}
+      className="absolute z-50 overflow-hidden rounded-3xl border border-border bg-card shadow-card"
       style={{
-        position: "absolute",
         left: position.left,
         top: position.top,
         width: position.width || 280,
-        backgroundColor: "white",
-        border: "1px solid #cbd5e1",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        zIndex: 1000,
-        overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          padding: "8px 12px",
-          borderBottom: "1px solid #e2e8f0",
-          background: "#f8fafc",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <span style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 bg-surface">
+        <span className="text-xs font-semibold text-foreground">
           {step === "node"
             ? "Select a node"
             : `Select output from ${selectedNode?.name}`}
@@ -112,32 +93,18 @@ export const VariableSelector = ({
         {step === "field" && (
           <button
             onClick={handleBack}
-            style={{
-              fontSize: "11px",
-              color: "#6366f1",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "2px 6px",
-            }}
+            className="rounded-md px-2 py-1 text-xs font-semibold text-accent transition hover:bg-accent/10"
           >
             ← Back
           </button>
         )}
       </div>
 
-      <div style={{ maxHeight: "260px", overflowY: "auto" }}>
+      <div className="max-h-[260px] overflow-y-auto">
         {step === "node" && (
           <>
             {availableNodes.length === 0 ? (
-              <div
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  fontSize: "12px",
-                }}
-              >
+              <div className="p-5 text-center text-sm text-muted">
                 No nodes with outputs available
               </div>
             ) : (
@@ -145,31 +112,11 @@ export const VariableSelector = ({
                 <div
                   key={node.id}
                   onClick={() => handleNodeSelect(node)}
-                  style={{
-                    padding: "10px 12px",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f1f5f9",
-                    fontSize: "13px",
-                    transition: "background-color 0.1s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#f1f5f9")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
+                  className="flex cursor-pointer items-center gap-2 border-b border-border/50 px-4 py-3 text-sm text-foreground transition hover:bg-surface"
                 >
-                  <span style={{ marginRight: "8px" }}>📦</span>
-                  {node.name}
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      color: "#64748b",
-                      marginLeft: "8px",
-                    }}
-                  >
-                    ({node.type})
-                  </span>
+                  <span>📦</span>
+                  <span>{node.name}</span>
+                  <span className="text-[11px] text-muted">({node.type})</span>
                 </div>
               ))
             )}
@@ -179,14 +126,7 @@ export const VariableSelector = ({
         {step === "field" && (
           <>
             {fields.length === 0 ? (
-              <div
-                style={{
-                  padding: "20px",
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  fontSize: "12px",
-                }}
-              >
+              <div className="p-5 text-center text-sm text-muted">
                 No output fields available
               </div>
             ) : (
@@ -194,22 +134,10 @@ export const VariableSelector = ({
                 <div
                   key={field.id}
                   onClick={() => handleFieldSelect(field)}
-                  style={{
-                    padding: "10px 12px",
-                    cursor: "pointer",
-                    borderBottom: "1px solid #f1f5f9",
-                    fontSize: "13px",
-                    transition: "background-color 0.1s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#f1f5f9")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
+                  className="flex cursor-pointer items-center gap-2 border-b border-border/50 px-4 py-3 text-sm text-foreground transition hover:bg-surface"
                 >
-                  <span style={{ marginRight: "8px" }}>🔌</span>
-                  {field.label || field.id}
+                  <span>🔌</span>
+                  <span>{field.label || field.id}</span>
                 </div>
               ))
             )}

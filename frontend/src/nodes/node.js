@@ -6,16 +6,7 @@ export const Node = ({ id, data, type }) => {
 
   if (!config) {
     return (
-      <div
-        style={{
-          padding: "10px",
-          border: "2px solid #ef4444",
-          borderRadius: "8px",
-          background: "#fef2f2",
-          color: "#dc2626",
-          fontSize: "12px",
-        }}
-      >
+      <div className="rounded-2xl border-2 border-red-500 bg-red-50 p-3 text-sm text-red-700">
         <strong>Unknown node type:</strong> {type}
       </div>
     );

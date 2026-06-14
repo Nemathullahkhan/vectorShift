@@ -2,11 +2,13 @@ import { inputNodeConfig } from "./configs/inputNodeConfig";
 import { outputNodeConfig } from "./configs/outputNodeConfig";
 import { llmNodeConfig } from "./configs/llmNodeConfig";
 import { textNodeConfig } from "./configs/textNodeConfig";
-import { manualTriggerConfig } from "./configs/manualTriggerConfig";
 import { httpRequestConfig } from "./configs/httpRequestConfig";
-import { mathNodeConfig } from "./configs/mathNodeConfig";
 import { filterNodeConfig } from "./configs/filterNodeConfig";
-import { delayNodeConfig } from "./configs/delayNodeConfig";
+import { imageGeneratorConfig } from "./configs/imageGeneratorConfig";
+import { webSearchConfig } from "./configs/webSearchConfig";
+import { emailSenderConfig } from "./configs/emailSenderConfig";
+import { dataTransformerConfig } from "./configs/dataTransformerConfig";
+import { conditionConfig } from "./configs/conditionConfig";
 
 export const nodeRegistry = {
   // Original 4
@@ -14,12 +16,14 @@ export const nodeRegistry = {
   customOutput: outputNodeConfig,
   llm: llmNodeConfig,
   text: textNodeConfig,
-  // New 5
-  manualTrigger: manualTriggerConfig,
+  // New nodes
   httpRequest: httpRequestConfig,
-  math: mathNodeConfig,
   filter: filterNodeConfig,
-  delay: delayNodeConfig,
+  imageGenerator: imageGeneratorConfig,
+  webSearch: webSearchConfig,
+  emailSender: emailSenderConfig,
+  dataTransformer: dataTransformerConfig,
+  condition: conditionConfig,
 };
 
 /** Get config for a single node type */

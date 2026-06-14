@@ -1,30 +1,54 @@
+import {
+  Cpu,
+  Keyboard,
+  ArrowRightCircle,
+  Type,
+  Cloud,
+  Filter,
+  Image,
+  Search,
+  Mail,
+  GitBranch,
+  Sigma,
+} from "lucide-react";
 import { DraggableNode } from "./draggableNode";
 
 const NODES = [
-  // Original 4
-  { type: "customInput", label: "Input" },
-  { type: "llm", label: "LLM" },
-  { type: "customOutput", label: "Output" },
-  { type: "text", label: "Text" },
-  // New 5
-  { type: "manualTrigger", label: "Manual Trigger" },
-  { type: "httpRequest", label: "HTTP Request" },
-  { type: "math", label: "Math" },
-  { type: "filter", label: "Filter" },
-  { type: "delay", label: "Delay" },
+  { type: "customInput", label: "Input", icon: Keyboard },
+  { type: "llm", label: "LLM", icon: Cpu },
+  { type: "customOutput", label: "Output", icon: ArrowRightCircle },
+  { type: "text", label: "Text", icon: Type },
+
+  // New nodes
+  { type: "httpRequest", label: "HTTP Request", icon: Cloud },
+  { type: "filter", label: "Filter", icon: Filter },
+  { type: "imageGenerator", label: "Image Generator", icon: Image },
+  { type: "webSearch", label: "Web Search", icon: Search },
+  { type: "emailSender", label: "Email Sender", icon: Mail },
+  { type: "dataTransformer", label: "Data Transformer", icon: Sigma },
+  { type: "condition", label: "Condition", icon: GitBranch },
 ];
 
 export const PipelineToolbar = () => (
-  <div
-    style={{
-      padding: "12px 16px",
-      background: "#1e293b",
-      borderBottom: "1px solid #334155",
-    }}
-  >
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+  <div className="rounded-xl border border-border bg-card p-4 shadow-card">
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p className="text-xs uppercase tracking-[0.35em] text-muted">
+          Node palette
+        </p>
+        <p className="text-sm text-foreground">
+          Drag any node into the canvas.
+        </p>
+      </div>
+    </div>
+    <div className="flex flex-wrap gap-3">
       {NODES.map((node) => (
-        <DraggableNode key={node.type} type={node.type} label={node.label} />
+        <DraggableNode
+          key={node.type}
+          type={node.type}
+          label={node.label}
+          Icon={node.icon}
+        />
       ))}
     </div>
   </div>
