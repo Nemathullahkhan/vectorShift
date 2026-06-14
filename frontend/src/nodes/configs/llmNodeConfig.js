@@ -14,13 +14,15 @@ export const llmNodeConfig = {
       defaultValue: "gpt-3.5-turbo",
       options: ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet", "gemini-pro"],
     },
-    {
-      name: "temperature",
-      label: "Temperature",
-      type: "text",
-      defaultValue: "0.7",
-      placeholder: "0.0 – 1.0",
+    
+      {
+      name: "text",
+      label: "Text",
+      type: "textarea", // Important: Use textarea for auto-resize
+      defaultValue: "",
+      placeholder: "Enter text... Use {{NodeName.field}} for variables",
     },
+
   ],
 
   inputHandles: [

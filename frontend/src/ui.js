@@ -3,14 +3,14 @@ import ReactFlow, { Controls, Background } from "reactflow";
 import { useStore } from "./store";
 import { shallow } from "zustand/shallow";
 import { Node } from "./nodes/node";
-import { getAllNodeTypes } from "./nodes/nodeRegistry";
+import { getAllNodeTypes, getNodeConfig } from "./nodes/nodeRegistry";
 
 import "reactflow/dist/style.css";
 
 const gridSize = 20;
 const proOptions = { hideAttribution: true };
 
-// Build nodeTypes map from registry: { customInput: Node, llm: Node, ... }
+// Build nodeTypes map from registry
 const nodeTypes = getAllNodeTypes().reduce((acc, type) => {
   acc[type] = Node;
   return acc;
@@ -21,6 +21,7 @@ const selector = (state) => ({
   edges: state.edges,
   getNodeID: state.getNodeID,
   addNode: state.addNode,
+  getNextNodeName: state.getNextNodeName,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
@@ -34,10 +35,16 @@ export const PipelineUI = () => {
     edges,
     getNodeID,
     addNode,
+    getNextNodeName,
     onNodesChange,
     onEdgesChange,
     onConnect,
   } = useStore(selector, shallow);
+
+  const onDragOver = useCallback((event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }, []);
 
   const onDrop = useCallback(
     (event) => {
@@ -56,20 +63,24 @@ export const PipelineUI = () => {
       });
 
       const nodeID = getNodeID(type);
+      const config = getNodeConfig(type);
+      const baseTitle = config?.title || type;
+      const nodeName = getNextNodeName(type, baseTitle);
+      
       addNode({
         id: nodeID,
         type,
         position,
-        data: { id: nodeID, nodeType: type },
+        data: { 
+          id: nodeID, 
+          nodeType: type,
+          nodeName: nodeName,
+          dynamicInputHandles: []
+        },
       });
     },
-    [reactFlowInstance, getNodeID, addNode],
+    [reactFlowInstance, getNodeID, addNode, getNextNodeName],
   );
-
-  const onDragOver = useCallback((event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  }, []);
 
   return (
     <div ref={reactFlowWrapper} style={{ width: "100vw", height: "70vh" }}>
