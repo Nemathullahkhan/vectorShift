@@ -1,10 +1,10 @@
+import { Keyboard } from 'lucide-react';
+
 export const inputNodeConfig = {
   title:       'Input',
   type:        'customInput',
+  icon:        Keyboard,
   width:       210,
-  bgColor:     '#eff6ff',
-  borderColor: '#3b82f6',
-  titleColor:  '#1d4ed8',
 
   fields: [
     {
@@ -25,6 +25,6 @@ export const inputNodeConfig = {
 
   inputHandles:  [],
   outputHandles: [
-    { id: 'value', label: 'Value', color: '#3b82f6' },
+    { id: 'value', label: 'Value' },
   ],
 };

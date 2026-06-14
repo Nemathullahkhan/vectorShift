@@ -1,12 +1,10 @@
-// nodes/configs/outputNodeConfig.js
+import { ArrowRightCircle } from 'lucide-react';
 
 export const outputNodeConfig = {
   title: "Output",
   type: "customOutput",
+  icon: ArrowRightCircle,
   width: 210,
-  bgColor: "#faf5ff",
-  borderColor: "#9333ea",
-  titleColor: "#7e22ce",
 
   fields: [
     {
@@ -25,6 +23,6 @@ export const outputNodeConfig = {
     },
   ],
 
-  inputHandles: [{ id: "value", label: "Value", color: "#9333ea" }],
+  inputHandles: [{ id: "value", label: "Value" }],
   outputHandles: [],
 };

@@ -1,10 +1,10 @@
+import { Filter } from 'lucide-react';
+
 export const filterNodeConfig = {
   title: "Filter",
   type: "filter",
+  icon: Filter,
   width: 220,
-  bgColor: "#eef2ff",
-  borderColor: "#6366f1",
-  titleColor: "#4338ca",
 
   fields: [
     {
@@ -30,9 +30,9 @@ export const filterNodeConfig = {
     },
   ],
 
-  inputHandles: [{ id: "input", label: "Input", color: "#6366f1" }],
+  inputHandles: [{ id: "input", label: "Input" }],
   outputHandles: [
-    { id: "true", label: "True", color: "#16a34a" },
-    { id: "false", label: "False", color: "#ef4444" },
+    { id: "true", label: "True" },
+    { id: "false", label: "False" },
   ],
 };
