@@ -1,17 +1,31 @@
-// toolbar.js
+import { DraggableNode } from "./draggableNode";
 
-import { DraggableNode } from './draggableNode';
+const NODES = [
+  // Original 4
+  { type: "customInput", label: "Input" },
+  { type: "llm", label: "LLM" },
+  { type: "customOutput", label: "Output" },
+  { type: "text", label: "Text" },
+  // New 5
+  { type: "manualTrigger", label: "Manual Trigger" },
+  { type: "httpRequest", label: "HTTP Request" },
+  { type: "math", label: "Math" },
+  { type: "filter", label: "Filter" },
+  { type: "delay", label: "Delay" },
+];
 
-export const PipelineToolbar = () => {
-
-    return (
-        <div style={{ padding: '10px' }}>
-            <div style={{ marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                <DraggableNode type='customInput' label='Input' />
-                <DraggableNode type='llm' label='LLM' />
-                <DraggableNode type='customOutput' label='Output' />
-                <DraggableNode type='text' label='Text' />
-            </div>
-        </div>
-    );
-};
+export const PipelineToolbar = () => (
+  <div
+    style={{
+      padding: "12px 16px",
+      background: "#1e293b",
+      borderBottom: "1px solid #334155",
+    }}
+  >
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+      {NODES.map((node) => (
+        <DraggableNode key={node.type} type={node.type} label={node.label} />
+      ))}
+    </div>
+  </div>
+);
